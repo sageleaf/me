@@ -1,18 +1,18 @@
 from flask import Flask
 
 def create_app(config_filename):
-    app = Flask(__name__)
-    app.config.from_object(config_filename)
+    application = Flask(__name__)
+    application.config.from_object(config_filename)
     
     from app import bp
-    app.register_blueprint(bp, url_prefix='/api')
+    application.register_blueprint(bp, url_prefix='/api')
 
     # from Model import db
     # db.init_app(app)
 
-    return app
+    return application
 
 
 if __name__ == "__main__":
-    app = create_app("config")
-    app.run(debug=True)
+    application = create_app("config")
+    application.run(host='0.0.0.0', debug=True)
