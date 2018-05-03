@@ -2,51 +2,45 @@ import requests
 from lib.utils import verify_password
 from lib.db_utils import get_user_record, put_user_data
 from constants.errors import VALVE_100, VALVE_103
-from flask import jsonify, request
+from flask import abort, jsonify, request
 from flask_restful import Resource
-from boto3.dynamodb.conditions import Key
+from models.User import User
+from middleware.validate_user import validate_user
 
-class Login(Resource):
+class Me(Resource):
+    method_decorators = {'get': [validate_user]}
+
+    def get(self):
+        return { "session": "ok"  }
+    
 
     def put(self):
         json_data = request.get_json(force=True)
-
         email = json_data.get("email")
         password = json_data.get("password")
-        # ticket = request.cookies.get('ticket')
 
-        if password and email:
-            [error, user_login_data] = login_user(email, password)
+        if not email or not password:
+            abort(VALVE_100)
 
-            if not error:
+        user = User(email, password)
+        existing_user = user.get_user_from_store()
+
+        if not existing_user is None:
+            is_user_valid = user.validate_password(password)
+            if is_user_valid:
+                updated_user = user.update_store()
                 return {
-                    "authid": user_login_data.get("authid"),
-                    "ticket": user_login_data.get("ticket"),
-                    "expires": user_login_data.get("ticket_expires"),
+                    "email": updated_user.get("email"),
+                    "authid": updated_user.get("authid"),
+                    "ticket": updated_user.get("ticket"),
+                    "expires": updated_user.get("ticket_expires"),
                 }
             else:
-                return error, 400
-
+                abort(VALVE_103)
         else:
-            return VALVE_100, 400
+            user.create_new()
 
 
-def login_user(email, password):
-    user = get_user_record(email=email)
-
-    if not user == None:
-        authid         = user.get("authid")
-        pw_to_validate = user.get("password")
-        is_pw_verified = verify_password(password, pw_to_validate)
-
-        if is_pw_verified:
-            updated_user = put_user_data(email, password, authid)
-            return [ None, updated_user ]
-        else:
-            return [ VALVE_103 , None ]
-    else:
-        new_user = put_user_data(email, password)
-        return new_user
     
 
 

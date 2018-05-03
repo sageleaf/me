@@ -20,17 +20,17 @@ def generateUUID():
 
 def generate_session_ticket():
     now = datetime.datetime.now()
-    now_plus_10 = now + datetime.timedelta(minutes = 1)
+    now_plus_10 = now + datetime.timedelta(minutes = 10)
     return {
         "ticket": generateUUID(),
-        "expires": str(now_plus_10)
+        "expires": now_plus_10.strftime("%Y-%m-%d %H:%M:%S")
     }
 
 
 def validate_ticket(ticket, active_ticket, ticket_expires):
     match = ticket == active_ticket
-    now = datetime.datetime.now()
-    ticket_date = datetime.datetime.strptime(ticket_expires, '%Y-%m-%d %I:%M:%S.%f')
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ticket_date = ticket_expires
 
     if not match or ( ticket_date < now ):
         return False
