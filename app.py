@@ -9,5 +9,4 @@ api = Api(bp)
 
 # Route
 # @auth.verify_Login
-api.add_resource(Connections, '/v1/connections')
 api.add_resource(Vitals, '/v1/me/vitals')
