@@ -3,11 +3,12 @@ from flask_restful import Resource
 # from middleware.validate_user import validate_user
 from models.Heart import Heart
 import json
+import os
 
 class Vitals(Resource):
     # decorators = [validate_user]
 
-    def get(self):
+    def post(self):
       normalized_heart_rates = []
       req = requests.get('https://api.humanapi.co/v1/human/heart_rate/readings?access_token=demo')
       heart_rates = req.json()
@@ -21,6 +22,9 @@ class Vitals(Resource):
               "date": hr.get("timestamp")
           })
       return normalized_heart_rates
+
+    def get(self):
+      return os.environ.get("DB_CONNECTION")
 
 
 
