@@ -1,19 +1,14 @@
 import uuid
-import boto3
 import datetime
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
 from base64 import b64decode
-from config import DB_TYPE, AWS_ACCESS_KEY_ID, AWS_REGION_NAME, AWS_SECRET_ACCESS_KEY, PRIVATE_KEY
 
+default_date_format = "%Y-%m-%d %H:%M:%S"
+gmt_date_format = "%a, %d %b %Y %H:%M:%S GMT"
 
-db = boto3.resource(DB_TYPE, 
-    region_name=AWS_REGION_NAME,
-    aws_access_key_id=AWS_ACCESS_KEY_ID,
-    aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
     
-
 def generateUUID():
     return str(uuid.uuid4())
 
@@ -23,13 +18,21 @@ def generate_session_ticket():
     now_plus_10 = now + datetime.timedelta(minutes = 10)
     return {
         "ticket": generateUUID(),
-        "expires": now_plus_10.strftime("%Y-%m-%d %H:%M:%S")
+        "expires": now_plus_10.strftime(default_date_format)
+    }
+
+
+def extend_ticket_life():
+    now = datetime.datetime.now()
+    now_plus_10 = now + datetime.timedelta(minutes = 10)
+    return {
+        "expires": now_plus_10.strftime(default_date_format)
     }
 
 
 def validate_ticket(ticket, active_ticket, ticket_expires):
     match = ticket == active_ticket
-    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.datetime.now().strftime(default_date_format)
     ticket_date = ticket_expires
 
     if not match or ( ticket_date < now ):
