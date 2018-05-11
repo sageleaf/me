@@ -8,6 +8,7 @@ from ..resources.Token import Token
 from ..resources.Me import Me
 from ..resources.Callback import Callback
 from ..resources.Validate import Validate
+from ..resources.Nutrition import Search, Nutrition
 
 
 api_blueprint = Blueprint('api', __name__)
@@ -17,7 +18,8 @@ api = Api(api_blueprint)
 # Route
 api.add_resource(Me, '/v1/me')
 api.add_resource(Vitals, '/v1/me/vitals')
-
+api.add_resource(Search, '/v1/me/nutrition/search')
+api.add_resource(Nutrition, '/v1/me/nutrition')
 
 api.add_resource(Token, '/v1/connect')
 api.add_resource(Callback, '/v1/callback')
