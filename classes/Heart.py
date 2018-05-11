@@ -1,7 +1,5 @@
 
 
-
-
 class Heart:
     def __init__(self, source):
         self.rate = source.get("value")
