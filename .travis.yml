@@ -4,3 +4,4 @@ python:
 addons:
   apt:
     update: true
+script: pytest

@@ -51,8 +51,6 @@ class Me(Resource):
         auth = parse_auth_header(auth_type='jwt', auth_header=request.headers.get("Authorization"))
         token = request.cookies.get("token") or auth or None
 
-        print( "authorization:::", auth )
-
         if token is not None:
             valid_token = decode_jwt_token(token)
             return { "status": "ok"}, 200
