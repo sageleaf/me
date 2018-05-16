@@ -5,9 +5,8 @@ import requests
 from flask_restful import Resource
 from flask import request, jsonify
 from datetime import datetime
-from app import db
 from ..models.Vitals import Vitals as VitalsModel, vitals_schema
-from ..models.Users import Users, user_schema
+from ..models.Profile import Profile, profile_schema
 
 
 class Vitals(Resource):
@@ -48,8 +47,7 @@ class Vitals(Resource):
                 performed_at = entry.get("performed_at")
                 # @data_key: one_of("keytones", "glucose", ) 
                 newEntry = VitalsModel(manual_data_id=manual_data_id, profile_id=profile_id, created_at=created_at, data_key=data_key, data_value=data_value, performed_at=performed_at)
-                db.session.add(newEntry)
-                db.session.commit()
+                newEntry.commit()
                 vital = VitalsModel.query.filter_by(manual_data_id=manual_data_id).first()
                 vital_dump = vitals_schema.dump(vital)
                 # TODO: check for error -> if vital_dump.error:

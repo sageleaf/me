@@ -17,6 +17,7 @@ NUTRITIONIX_APP_KEY = env.get("NUTRITIONIX_APP_KEY")
 NUTRITIONIX_BASE_URL = "https://trackapi.nutritionix.com/v2"
 NUTRITIONIX_PATH_NUTRIENTS = "/natural/nutrients"
 NUTRITIONIX_PATH_SEARCH = "/search/instant"
+PRIVATE_KEY=env.get("PRIVATE_KEY")
 
 
 

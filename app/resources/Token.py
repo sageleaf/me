@@ -4,7 +4,7 @@ import requests
 from flask_restful import Resource
 from flask import request, jsonify
 from app import db
-from ..models.Users import Users, user_schema
+from ..models.Profile import Profile, profile_schema
 from config import HUMAN_API_CLIENT_SECRET, HUMAN_API_BASE_URL, HUMAN_API_PATH_TOKEN
 
 

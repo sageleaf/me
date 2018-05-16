@@ -19,6 +19,11 @@ class Vitals(db.Model):
         self.data_key = data_key
         self.data_value = data_value
         self.performed_at = performed_at
+    
+
+    def commit(self):
+        db.session.add(self)
+        db.session.commit()
 
 
 class VitalsSchema(Schema):
