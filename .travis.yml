@@ -4,6 +4,9 @@ python:
 addons:
   apt:
     update: true
+before_install:
+  - pip install pytest-cov
+  - pip install coveralls
 script: 
   py.test
 after_success:
