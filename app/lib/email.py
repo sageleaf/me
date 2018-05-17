@@ -1,17 +1,21 @@
 import smtplib
+from config import SAGELEAF_EMAIL_ADDRESS, GMAIL_EMAIL_ADDRESS, GMAIL_PASSWORD
 
 def send_email(email, subject, message):
+    print(SAGELEAF_EMAIL_ADDRESS)
+    print(GMAIL_EMAIL_ADDRESS)
+    print(GMAIL_PASSWORD)
     server = smtplib.SMTP("smtp.gmail.com:587")
     server.ehlo()
     server.starttls()
     server.ehlo()
-    server.login("verify.sage@gmail.com", "Google0912!")
+    server.login(GMAIL_EMAIL_ADDRESS, GMAIL_PASSWORD)
     msg = "\r\n".join([
-        "From: verify.sage@gmail.com",
+        "From: " + SAGELEAF_EMAIL_ADDRESS,
         "To: " + email,
         "Subject: " + subject,
         "",
         message
     ])
-    server.sendmail("verify.sage@gmail.com", email, msg)
+    server.sendmail(GMAIL_EMAIL_ADDRESS, email, msg)
     server.quit()
