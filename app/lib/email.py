@@ -2,9 +2,6 @@ import smtplib
 from config import SAGELEAF_EMAIL_ADDRESS, GMAIL_EMAIL_ADDRESS, GMAIL_PASSWORD
 
 def send_email(email, subject, message):
-    print(SAGELEAF_EMAIL_ADDRESS)
-    print(GMAIL_EMAIL_ADDRESS)
-    print(GMAIL_PASSWORD)
     server = smtplib.SMTP("smtp.gmail.com:587")
     server.ehlo()
     server.starttls()
