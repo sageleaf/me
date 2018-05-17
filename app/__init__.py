@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from scout_apm.flask import ScoutApm
 from scout_apm.flask.sqlalchemy import instrument_sqlalchemy
-
+from config import SCOUT_KEY, SCOUT_LOG_LEVEL, SCOUT_MONITOR, SCOUT_NAME
 db = SQLAlchemy()
 
 def create_app(config_filename):
@@ -17,6 +17,9 @@ def create_app(config_filename):
 
     from .api import api_blueprint
     app.register_blueprint(api_blueprint, url_prefix='/api')
-    app.config['SCOUT_NAME'] = "SAGE_LEAF_ME"
+    app.config['SCOUT_MONITOR'] = SCOUT_MONITOR
+    app.config['SCOUT_LOG_LEVEL'] = SCOUT_LOG_LEVEL
+    app.config['SCOUT_KEY'] = SCOUT_KEY
+    app.config['SCOUT_NAME'] = SCOUT_NAME
 
     return app
