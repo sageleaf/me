@@ -6,9 +6,9 @@ addons:
     update: true
 before_install:
   - pip install pytest-cov
-  - pip install coveralls
+  - pip install codecov
   - pip install pyyaml
 script: 
-  py.test --cov=app tests/
+  - py.test --cov=app tests/
 after_success:
-  - bash < (curl -s https://codecov.io/bash)
+  - codecov
