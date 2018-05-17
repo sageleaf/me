@@ -39,7 +39,7 @@ def parse_auth_header(auth_type, auth_header=""):
         return None
 
 
-class Me(Resource):
+class Ping(Resource):
     # validate a users session
     def get(self): 
         # ping server to validate user 
@@ -58,6 +58,48 @@ class Me(Resource):
             return { "status": "not ok" }, 401
 
 
+class Exchange(Resource):
+    # validate a users session
+    # in: (query string)
+    #   code -> verification_code: sent via email, SMS
+    #   session -> session_id, sent from POST `/api/me``
+    # out: 
+    #   token
+    #
+    def get(self): 
+        verification_code = request.args.get('code')
+        session_id = request.args.get('session')
+
+        if verification_code is None or session_id is None:
+            return { "status": "invalid session" }, 400
+
+        session = Session.query.filter_by(session_id=session_id).first()
+        session_dump = session_schema.dump(session)
+        session_data = session_dump.data
+
+        if session_data.get("status") == 1:
+            return { "status": "session already validated" }, 400
+
+        if is_date_passed(session_data.get("expires")):
+            return { "status": "session is not valid" }, 400
+
+        session.status = 1
+        session.modify()
+        
+        auth_token= encode_jwt_token(session_data.get("profile_id"))
+        readable_auth_token = auth_token.decode()
+
+        response = make_response(jsonify(
+            token=readable_auth_token
+        ), 200)
+
+        response.set_cookie("token", readable_auth_token, secure=True)
+
+        return response
+
+
+
+class Profile(Resource):
     def post(self): 
         # create a new profile
         # in: (post body)
@@ -100,44 +142,4 @@ class Me(Resource):
         return {
             "session_id": session_id
         }
-
-
-class VerifyMe(Resource):
-    # validate a users session
-    # in: (query string)
-    #   code -> verification_code: sent via email, SMS
-    #   session -> session_id, sent from POST `/api/me``
-    # out: 
-    #   token
-    #
-    def get(self): 
-        verification_code = request.args.get('code')
-        session_id = request.args.get('session')
-
-        if verification_code is None or session_id is None:
-            return { "status": "invalid session" }, 400
-
-        session = Session.query.filter_by(session_id=session_id).first()
-        session_dump = session_schema.dump(session)
-        session_data = session_dump.data
-
-        if session_data.get("status") == 1:
-            return { "status": "session already validated" }, 400
-
-        if is_date_passed(session_data.get("expires")):
-            return { "status": "session is not valid" }, 400
-
-        session.status = 1
-        session.modify()
-        
-        auth_token= encode_jwt_token(session_data.get("profile_id"))
-        readable_auth_token = auth_token.decode()
-
-        response = make_response(jsonify(
-            token=readable_auth_token
-        ), 200)
-
-        response.set_cookie("token", readable_auth_token, secure=True)
-
-        return response
 
