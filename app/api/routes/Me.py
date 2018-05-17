@@ -39,7 +39,7 @@ def parse_auth_header(auth_type, auth_header=""):
         return None
 
 
-class Ping(Resource):
+class PingCtrl(Resource):
     # validate a users session
     def get(self): 
         # ping server to validate user 
@@ -58,7 +58,7 @@ class Ping(Resource):
             return { "status": "not ok" }, 401
 
 
-class Exchange(Resource):
+class ExchangeCtrl(Resource):
     # validate a users session
     # in: (query string)
     #   code -> verification_code: sent via email, SMS
@@ -99,7 +99,7 @@ class Exchange(Resource):
 
 
 
-class Profile(Resource):
+class ProfileCtrl(Resource):
     def post(self): 
         # create a new profile
         # in: (post body)
