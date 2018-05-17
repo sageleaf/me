@@ -1,5 +1,5 @@
-# Valve
-[![Build Status](https://travis-ci.com/heart-your-health/valve.svg?branch=master)](https://travis-ci.com/heart-your-health/valve)
+# Sage Leaf Authenticate "Me"
+[![Build Status](https://travis-ci.com/sageleaf/me.svg?branch=master)](https://travis-ci.com/sageleaf/me)
 
 
-This is literally the heart and core of the Heart Your Health platform. We will have much more info to in the comming weeks. 
+This is the rest endpoint that we use for authentication. 

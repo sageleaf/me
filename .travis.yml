@@ -4,4 +4,7 @@ python:
 addons:
   apt:
     update: true
-script: pytest
+script: 
+  py.test
+after_success:
+  - coveralls
