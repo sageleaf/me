@@ -7,6 +7,7 @@ addons:
 before_install:
   - pip install pytest-cov
   - pip install coveralls
+  - pip install pyyaml
 script: 
   py.test --cov=app tests/
 after_success:
