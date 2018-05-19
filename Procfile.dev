@@ -1,0 +1,2 @@
+web: gunicorn -k aiohttp.worker.GunicornWebWorker "app:create_app()" --reload --log-file=log/development.log 
+log: tail -f log/development.log

@@ -1,1 +1,1 @@
-web: gunicorn application:app --log-file=-
+web: gunicorn -k aiohttp.worker.GunicornWebWorker "app:create_app()" --log-file=-
