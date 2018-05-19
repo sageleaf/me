@@ -1,4 +1,5 @@
 aiohttp==3.2.1
+aiohttp-cors==0.7.0
 alembic==0.9.9
 aniso8601==3.0.0
 asn1crypto==0.24.0
