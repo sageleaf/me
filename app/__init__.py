@@ -27,6 +27,7 @@
 
 import json
 from aiohttp.web import Response, Application, json_response
+import aiohttp_cors
 from .lib.database import db_init
 from .lib.utils import get_config, get_file
 
@@ -38,9 +39,17 @@ def create_app():
     app["config"] = config
     db_init(app)
 
+    cors = aiohttp_cors.setup(app, defaults={
+        "*": aiohttp_cors.ResourceOptions(
+                allow_credentials=True,
+                expose_headers="*",
+                allow_headers="*",
+            )
+        })
+
     from .api.routes import handle_authenticate_profile, handle_token_validation, handle_token_exchange
-    app.router.add_post('/api/v1/profile', handle_authenticate_profile)
-    app.router.add_get('/api/v1/exchange', handle_token_exchange)
-    app.router.add_get('/api/v1/validation', handle_token_validation)
+    cors.add(app.router.add_post('/api/v1/profile', handle_authenticate_profile))
+    cors.add(app.router.add_get('/api/v1/exchange', handle_token_exchange))
+    cors.add(app.router.add_get('/api/v1/validation', handle_token_validation))
 
     return app 
