@@ -21,8 +21,8 @@ def encode_jwt_token(profile_id):
 def decode_jwt_token(auth_token):
     try:
         payload = jwt.decode(auth_token, PRIVATE_KEY)
-        return payload['sub']
+        return payload['sub'], None
     except jwt.ExpiredSignatureError:
-        return 'Signature expired. Please log in again.'
+        return None, 'Signature expired. Please log in again.'
     except jwt.InvalidTokenError:
-        return 'Invalid token. Please log in again.'
+        return None, 'Invalid token. Please log in again.'

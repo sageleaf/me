@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
-
+from .loggers import logger
 
 session = scoped_session(sessionmaker())
 class BaseMixin(object):
@@ -16,4 +16,4 @@ def db_init(app):
     Base.metadata.bind = engine
     Base.metadata.create_all()
     session.configure(bind=engine)
-    print( "DATABASE CONFIGURED" )
+    logger.info( "DATABASE CONFIGURED" )

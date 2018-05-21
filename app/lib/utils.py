@@ -13,7 +13,7 @@ import sys
 utc=pytz.UTC
 
 
-def generate_uuid():
+def generate_uuid() -> str:
     return str(uuid.uuid4())
 
 
@@ -29,14 +29,22 @@ def is_date_passed(date):
     return utc.localize(get_now()) > parser.parse(date)
 
 
-def generate_verification_code():
+def generate_verification_code() -> int:
     return randint(111111, 999999)
 
 
-def get_file(path, extention):
+def get_file(path, extention) -> str:
     here_folder = os.path.dirname(os.path.abspath(__file__))
     file_name = os.path.join(here_folder, "../../" + path + "." + extention)
     return file_name
+
+
+def parse_auth_header(auth_type, auth_header="") -> str:
+    auth = auth_header.split()
+    if len(auth) == 2 and auth[0] == auth_type:
+        return auth[1]
+    else:
+        return None
 
 
 def get_config(file_name):
@@ -59,3 +67,25 @@ def get_config(file_name):
         sys.stderr.write('Failed to read config file: %s' % file_name)
         sys.stderr.flush()
         raise
+
+
+def match_request(urls, method: str, path: str) -> bool:
+    def match_item(item, path: str) -> bool:
+        try:
+            return bool(item.match(path))  # type: ignore
+        except (AttributeError, TypeError):
+            return item == path
+
+    found = [item for item in urls if match_item(item, path)]
+    if not found:
+        return False
+
+    if not isinstance(urls, dict):
+        return True
+
+    found_item = urls[found[0]]
+    method = method.lower()
+    if isinstance(found_item, str):
+        return found_item.lower() == method
+
+    return any(True for item in found_item if item.lower() == method)

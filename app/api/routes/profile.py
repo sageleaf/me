@@ -1,27 +1,30 @@
+import asyncio
 from aiohttp.web import json_response
 from sqlalchemy import Column, Integer, String, DateTime
 from marshmallow import Schema, fields
 from ...lib.database import Base, session
 from ...lib.tokens import encode_jwt_token, decode_jwt_token
 from ...lib.email import send_email
-from ...lib.utils import generate_uuid, get_now, generate_verification_code, get_future_date, is_date_passed
+from ...lib.loggers import logger
+from ...lib.utils import generate_uuid, get_now, generate_verification_code, get_future_date, is_date_passed, parse_auth_header
 
 
 # route handlers
-async def handle_authenticate_profile(request):
+async def handle_authenticate_profile(request) -> json_response:
     post_body = await request.json()
     (profile_id, email), error = maybe_add_profile(post_body)
 
     if error:
+        logger.error("DATA BASE: ", error)
         return json_response(error, status=400)
 
     session_id, verification_code = generate_session(profile_id=profile_id)
-    generate_verification_email(email=email, verification_code=verification_code)
+    asyncio.ensure_future(generate_verification_email(email=email, verification_code=verification_code))
 
     return json_response({"session_id": session_id})
 
 
-async def handle_token_exchange(request):
+async def handle_token_exchange(request) -> json_response:
     # validate a users session
     # in: (query string)
     #   code -> verification_code: sent via email, SMS
@@ -59,7 +62,7 @@ async def handle_token_exchange(request):
     return response
 
 
-async def handle_token_validation(request):
+async def handle_token_validation(request) -> json_response:
     # ping server to validate user 
     # in: (cookie, auth header)
     #   token -> passed via cooke
@@ -77,7 +80,7 @@ async def handle_token_validation(request):
 
 
 # helpers
-def maybe_add_profile(post_body):
+def maybe_add_profile(post_body) -> (list, str):
     email = post_body.get("email")
     phone_number = post_body.get("phone")
     first_name = post_body.get("first_name")
@@ -106,33 +109,28 @@ def maybe_add_profile(post_body):
     return (profile_id, email), None
 
 
-def generate_session(profile_id):
+def generate_session(profile_id) -> (str, str):
     # TODO: validate profile data worked `newProfile.query.filter_by(profile_id=profile_id)`
-        session_id = generate_uuid()
-        verification_code = generate_verification_code()
-        newSession = Session(profile_id=profile_id, session_id=session_id, verification_code=verification_code, expires=get_future_date(90))
-        newSession.commit()
-        return (session_id, verification_code)
+    session_id = generate_uuid()
+    verification_code = generate_verification_code()
+    newSession = Session(profile_id=profile_id, session_id=session_id, verification_code=verification_code, expires=get_future_date(90))
+    newSession.commit()
+    logger.info("new session generated for profile_id " + profile_id)
+    return (session_id, verification_code)
 
 
-def generate_new_profile(email, first_name, last_name, phone_number):
+def generate_new_profile(email, first_name, last_name, phone_number) -> str:
         profile_id = generate_uuid()
         newProfile = Profile(profile_id=profile_id, created_at=get_now(), email=email, first_name=first_name, last_name=last_name, phone_number=phone_number)
         newProfile.commit()
+        logger.info("new profile generated for profile_id " + profile_id)
         return profile_id
 
 
-def generate_verification_email(email, verification_code):
+async def generate_verification_email(email, verification_code) -> None:
         msg = "Verify using this code: " + str(verification_code)
+        logger.info("email generated for " + email)
         send_email(email=email, subject="Verify Your Account", message=msg)
-
-
-def parse_auth_header(auth_type, auth_header=""):
-    auth = auth_header.split()
-    if len(auth) == 2 and auth[0] == auth_type:
-        return auth[1]
-    else:
-        return None
 
 
 # database schemas
