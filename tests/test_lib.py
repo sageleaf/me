@@ -19,13 +19,13 @@ def test_encode_jwt_token_error():
     assert isinstance(t, TypeError)
 
 
-def test_decode_jwt_token_error():
+def test_decode_jwt_token_invalid_error():
     d, e = decode_jwt_token("blah")
     assert d == None
     assert e == 'Invalid token. Please log in again.'
 
 
-def test_decode_jwt_token_error():
+def test_decode_jwt_token_expired_error():
     exp = datetime.datetime.utcnow() - datetime.timedelta(days=1, seconds=5)
     iat = datetime.datetime.utcnow() - datetime.timedelta(days=1)
     t = encode_jwt_token(profile_id="blah", exp=exp, iat=iat )
