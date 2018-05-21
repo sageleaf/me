@@ -8,15 +8,17 @@ from app.lib.tokens import encode_jwt_token, decode_jwt_token
 
 
 def test_encode_decode_jwt_token():
-    t = encode_jwt_token("abc-123")
-    d, e = decode_jwt_token(t)
+    t, te = encode_jwt_token("abc-123")
+    d, de = decode_jwt_token(t)
     assert d == "abc-123"
-    assert e == None
+    assert te == None
+    assert de == None
 
 
 def test_encode_jwt_token_error():
-    t = encode_jwt_token(bool)
-    assert isinstance(t, TypeError)
+    t, e = encode_jwt_token(bool)
+    assert isinstance(e, TypeError)
+    assert t == None
 
 
 def test_decode_jwt_token_invalid_error():
@@ -28,7 +30,7 @@ def test_decode_jwt_token_invalid_error():
 def test_decode_jwt_token_expired_error():
     exp = datetime.datetime.utcnow() - datetime.timedelta(days=1, seconds=5)
     iat = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-    t = encode_jwt_token(profile_id="blah", exp=exp, iat=iat )
+    t, te = encode_jwt_token(profile_id="blah", exp=exp, iat=iat )
     d, e = decode_jwt_token(t)
     assert d == None
     assert e == 'Signature expired. Please log in again.'

@@ -52,7 +52,11 @@ async def handle_token_exchange(request) -> json_response:
     session.status = 1
     session.modify()
     
-    auth_token= encode_jwt_token(session_data.get("profile_id"))
+    auth_token, encode_error = encode_jwt_token(session_data.get("profile_id"))
+
+    if encode_error:
+        return json_response({"error": "unable to encode token" }, status=500)
+
     readable_auth_token = auth_token.decode()
 
     response = json_response({"token": readable_auth_token }, status=200)
@@ -73,10 +77,13 @@ async def handle_token_validation(request) -> json_response:
     token = request.cookies.get("token") or auth or None
 
     if token is not None:
-        valid_token = decode_jwt_token(token)
-        return json_response({ "status": "ok"})
+        valid_token, token_error = decode_jwt_token(token)
+        if token_error:
+            return json_response({ "error": token_error })
+        else :
+            return json_response({ "status": "ok"})
     else:
-        return json_response({ "status": "ok"}, status=401)
+        return json_response({ "error": "missing token"}, status=401)
 
 
 # helpers

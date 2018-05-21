@@ -12,7 +12,10 @@ from .constants.ignore import ignore_validation
 
 def create_app():
     file_name = get_file(path="config", extention="py")
-    config = get_config(file_name=file_name)
+    config, config_error = get_config(file_name=file_name)
+
+    if config_error:
+        raise config_error
    
     app = Application(middlewares=[
         validation(ignore=ignore_validation)])

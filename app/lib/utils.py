@@ -17,11 +17,11 @@ def generate_uuid() -> str:
     return str(uuid.uuid4())
 
 
-def get_now():
+def get_now() -> datetime.datetime:
     return datetime.datetime.utcnow()
 
 
-def get_future_date(seconds):
+def get_future_date(seconds) -> datetime.datetime:
     return get_now() + datetime.timedelta(seconds=seconds)
 
 
@@ -47,7 +47,7 @@ def parse_auth_header(auth_type, auth_header="") -> str:
         return None
 
 
-def get_config(file_name):
+def get_config(file_name) -> (str, str):
     try:
         config_dir = os.path.dirname(file_name)
         with NamedTemporaryFile(suffix='.py', dir=config_dir, delete=True) as tf:
@@ -61,12 +61,12 @@ def get_config(file_name):
         else:
             settings = {k: v for k, v in vars(module).items() if not k.startswith('_')}
 
-        return MappingProxyType(settings)
+        return MappingProxyType(settings), None
 
-    except Exception:
+    except Exception as e:
         sys.stderr.write('Failed to read config file: %s' % file_name)
         sys.stderr.flush()
-        raise
+        return None, e
 
 
 def match_request(urls, method: str, path: str) -> bool:

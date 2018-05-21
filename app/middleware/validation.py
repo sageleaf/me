@@ -1,5 +1,5 @@
 from aiohttp.web import HTTPForbidden
-from ..lib.utils import get_config, get_file, parse_auth_header, match_request
+from ..lib.utils import parse_auth_header, match_request
 from ..lib.tokens import decode_jwt_token
 from ..lib.loggers import logger
 
