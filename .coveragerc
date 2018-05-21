@@ -1,0 +1,7 @@
+[run]
+omit = 
+    app/api/routes*
+    app/lib/database.py
+    app/lib/loggers.py
+    app/constants/ignore.py
+    app/__init__.py
