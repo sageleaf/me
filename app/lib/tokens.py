@@ -2,11 +2,11 @@ import jwt
 import datetime
 from config import PRIVATE_KEY
 
-def encode_jwt_token(profile_id):
+def encode_jwt_token(profile_id, exp=datetime.datetime.utcnow() + datetime.timedelta(days=1, seconds=5), iat=datetime.datetime.utcnow(), ) -> str:
     try:
         payload = {
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1, seconds=5),
-            'iat': datetime.datetime.utcnow(),
+            'exp': exp,
+            'iat': iat,
             'sub': profile_id
         }
         return jwt.encode(
@@ -18,7 +18,7 @@ def encode_jwt_token(profile_id):
         return e
 
 
-def decode_jwt_token(auth_token):
+def decode_jwt_token(auth_token) -> (str, str):
     try:
         payload = jwt.decode(auth_token, PRIVATE_KEY)
         return payload['sub'], None
