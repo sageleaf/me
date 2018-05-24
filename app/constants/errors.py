@@ -25,6 +25,12 @@ error_dict = {
         "message" : "invalid login credentials",
         "detail": "either you login or password is incorrect"
     },
+    "invalid_application": {
+        "code" : "SAGE-421",
+        "type": "CLIENT",
+        "message" : "invalid application",
+        "detail": "please ensure that you are passing the correct api_key and app_id"
+    },
     "jwt_error": {
         "code" : "SAGE-350",
         "type": "CLIENT",

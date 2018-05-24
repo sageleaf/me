@@ -1,6 +1,6 @@
 import jwt 
 import datetime
-from config import PRIVATE_KEY, JWT_ISS, HOST
+from config import PRIVATE_KEY, HOST
 
 def encode_jwt_token(profile_id, exp=datetime.datetime.utcnow() + datetime.timedelta(days=1, seconds=5), iat=datetime.datetime.utcnow(), ) -> (str, str):
     try:
@@ -8,7 +8,7 @@ def encode_jwt_token(profile_id, exp=datetime.datetime.utcnow() + datetime.timed
             'exp': exp,
             'iat': iat,
             'sub': profile_id,
-            'iss': JWT_ISS,
+            'iss': HOST,
             'aud': HOST
         }
         return jwt.encode(
@@ -22,8 +22,8 @@ def encode_jwt_token(profile_id, exp=datetime.datetime.utcnow() + datetime.timed
 
 def decode_jwt_token(auth_token) -> (str, str):
     try:
-        payload = jwt.decode(auth_token, PRIVATE_KEY, audience=HOST, issuer=JWT_ISS)
-        if payload['iss'] != JWT_ISS:
+        payload = jwt.decode(auth_token, PRIVATE_KEY, audience=HOST, issuer=HOST)
+        if payload['iss'] != HOST:
             return None, 'Invalid issuer'
 
         if payload['aud'] != HOST:

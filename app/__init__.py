@@ -8,6 +8,7 @@ from .lib.utils import get_config, get_file, parse_auth_header
 from .lib.loggers import logger
 from .middleware.validation import validation
 from .middleware.transaction import transaction
+from .middleware.validate_app import validate_app
 from .constants.ignore import ignore_validation
 
 
@@ -19,6 +20,7 @@ def create_app():
         raise config_error
    
     app = Application(middlewares=[
+        validate_app,
         validation(ignore=ignore_validation),
         transaction
         ])
