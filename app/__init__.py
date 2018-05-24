@@ -7,6 +7,7 @@ from .lib.database import db_init
 from .lib.utils import get_config, get_file, parse_auth_header
 from .lib.loggers import logger
 from .middleware.validation import validation
+from .middleware.transaction import transaction
 from .constants.ignore import ignore_validation
 
 
@@ -18,7 +19,9 @@ def create_app():
         raise config_error
    
     app = Application(middlewares=[
-        validation(ignore=ignore_validation)])
+        validation(ignore=ignore_validation),
+        transaction
+        ])
 
     app["config"] = config
     db_init(app)
@@ -35,10 +38,25 @@ def create_app():
             )
         })
 
-    from .api.routes import handle_authenticate_profile, handle_token_validation, handle_token_exchange
+    from .api.routes import (
+        handle_authenticate_profile,
+        handle_get_profile,
+        handle_token_validation,
+        handle_token_exchange,
+        handle_add_eats,
+        handle_search_eats,
+        handle_browse_eats, 
+        handle_get_eats)
+
     cors.add(app.router.add_post('/api/v1/profile', handle_authenticate_profile))
+    cors.add(app.router.add_get('/api/v1/profile', handle_get_profile))
     cors.add(app.router.add_put('/api/v1/profile', handle_authenticate_profile))
     cors.add(app.router.add_get('/api/v1/exchange', handle_token_exchange))
     cors.add(app.router.add_get('/api/v1/validation', handle_token_validation))
+    #eats 
+    cors.add(app.router.add_get('/api/v1/eats', handle_get_eats))
+    cors.add(app.router.add_post('/api/v1/eats', handle_add_eats))
+    cors.add(app.router.add_get('/api/v1/eats/search', handle_search_eats))
+    cors.add(app.router.add_get('/api/v1/eats/browse', handle_browse_eats))
 
     return app 
