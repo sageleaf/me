@@ -109,7 +109,7 @@ async def handle_token_validation(request) -> json_response:
     if token is not None:
         valid_token, token_error = decode_jwt_token(token)
         if token_error:
-            return json_response(generate_error('catastrophic', detail=None), status=500)
+            return json_response(generate_error('catastrophic', detail=token_error), status=500)
         else :
             return json_response({ "status": "ok"})
     else:

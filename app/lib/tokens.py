@@ -1,13 +1,15 @@
 import jwt 
 import datetime
-from config import PRIVATE_KEY
+from config import PRIVATE_KEY, JWT_ISS, HOST
 
 def encode_jwt_token(profile_id, exp=datetime.datetime.utcnow() + datetime.timedelta(days=1, seconds=5), iat=datetime.datetime.utcnow(), ) -> (str, str):
     try:
         payload = {
             'exp': exp,
             'iat': iat,
-            'sub': profile_id
+            'sub': profile_id,
+            'iss': JWT_ISS,
+            'aud': HOST
         }
         return jwt.encode(
             payload,
@@ -20,8 +22,15 @@ def encode_jwt_token(profile_id, exp=datetime.datetime.utcnow() + datetime.timed
 
 def decode_jwt_token(auth_token) -> (str, str):
     try:
-        payload = jwt.decode(auth_token, PRIVATE_KEY)
+        payload = jwt.decode(auth_token, PRIVATE_KEY, audience=HOST, issuer=JWT_ISS)
+        if payload['iss'] != JWT_ISS:
+            return None, 'Invalid issuer'
+
+        if payload['aud'] != HOST:
+            return None, 'Invalid audiance'
+
         return payload['sub'], None
+
     except jwt.ExpiredSignatureError:
         return None, 'Signature expired. Please log in again.'
     except jwt.InvalidTokenError:
